@@ -109,7 +109,7 @@ const Home = () => {
         )}
       </div>
 
-      <div className='mt-[20rem] sm:mt-[12rem] lg:mt-[10rem]'>
+      <div className='mt-[22rem] sm:mt-[12rem] lg:mt-[10rem]'>
         {items.length > 0 ? (
           <Products data={items} />
         ) : (
