@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { FaHeart } from 'react-icons/fa'
-import { FaRegHeart } from 'react-icons/fa'
+import { FaHeart, FaRegHeart } from 'react-icons/fa'
 import { ChevronLeft, ChevronRight } from 'react-feather'
-import { Link, redirect, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
 import {
   deleteUserFromDatabase,
@@ -16,6 +15,7 @@ const Carousel = ({ slides, docId, price, name, country }) => {
   const navigate = useNavigate()
   const [isLiked, setIsLiked] = useState(false)
   const { user } = useUser()
+
   useEffect(() => {
     const initializeUserData = async () => {
       if (user) {
@@ -28,6 +28,7 @@ const Carousel = ({ slides, docId, price, name, country }) => {
     }
     initializeUserData()
   }, [user])
+
   const setUserData = async () => {
     const { id } = user
     const data = await getUserFromDataBase({ docId, userId: id })
@@ -40,16 +41,22 @@ const Carousel = ({ slides, docId, price, name, country }) => {
       setIsLiked(false)
     }
   }
+
   const handleUser = async () => {
     if (!user) return navigate('/login')
     else {
       setUserData()
     }
   }
+
   const prev = () =>
     setCurr((curr) => (curr === 0 ? slides.length - 1 : curr - 1))
   const next = () =>
     setCurr((curr) => (curr === slides.length - 1 ? 0 : curr + 1))
+
+  const handleDotClick = (index) => {
+    setCurr(index)
+  }
 
   return (
     <div
@@ -96,8 +103,9 @@ const Carousel = ({ slides, docId, price, name, country }) => {
             <div
               key={i}
               className={`transition-all w-2 h-2 bg-white rounded-full ${
-                curr === i ? 'p-2' : 'bg-opacity-50'
+                curr === i ? 'p-2' : 'bg-opacity-50 cursor-pointer'
               }`}
+              onClick={() => handleDotClick(i)} // <-- Add onClick event handler
             />
           ))}
         </div>
