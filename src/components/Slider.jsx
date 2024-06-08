@@ -1,9 +1,10 @@
+import React, { memo } from 'react'
 import Carousel from './Carousel'
 import { Link } from 'react-router-dom'
 
-const Slider = ({ images, id, price, name, country, docId }) => {
+const Slider = memo(({ images, id, price, name, country, docId }) => {
   return (
-    <div className='w-full bg-base-200 pb-2 rounded-b-lg '>
+    <div className='w-full bg-base-200 pb-2 rounded-b-lg'>
       <Carousel
         key={id}
         slides={images}
@@ -20,6 +21,6 @@ const Slider = ({ images, id, price, name, country, docId }) => {
       </div>
     </div>
   )
-}
+})
 
 export default Slider

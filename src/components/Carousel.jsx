@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
 import { ChevronLeft, ChevronRight } from 'react-feather'
 import { Link, useNavigate } from 'react-router-dom'
@@ -12,8 +12,8 @@ import {
 const Carousel = ({ slides, docId, price, name, country }) => {
   const [curr, setCurr] = useState(0)
   const [active, setActive] = useState(false)
-  const navigate = useNavigate()
   const [isLiked, setIsLiked] = useState(false)
+  const navigate = useNavigate()
   const { user } = useUser()
 
   useEffect(() => {
@@ -54,9 +54,7 @@ const Carousel = ({ slides, docId, price, name, country }) => {
   const next = () =>
     setCurr((curr) => (curr === slides.length - 1 ? 0 : curr + 1))
 
-  const handleDotClick = (index) => {
-    setCurr(index)
-  }
+  const handleDotClick = (index) => setCurr(index)
 
   return (
     <div
@@ -71,15 +69,15 @@ const Carousel = ({ slides, docId, price, name, country }) => {
         {slides.map((img, index) => (
           <Link key={index} to={`${docId}`} className='flex-shrink-0 w-full'>
             <img
-              key={index}
               src={img}
               alt=''
-              className='h-[16rem] w-full object-cover rounded-md '
+              className='h-[16rem] w-full object-cover rounded-md'
+              loading='lazy'
             />
           </Link>
         ))}
       </div>
-      <div className='flex justify-between '>
+      <div className='flex justify-between'>
         <button
           onClick={prev}
           className={`p-1 rounded-full shadow bg-white/80 text-gray-500 absolute top-[50%] hover:bg-white ${
@@ -105,7 +103,7 @@ const Carousel = ({ slides, docId, price, name, country }) => {
               className={`transition-all w-2 h-2 bg-white rounded-full ${
                 curr === i ? 'p-2' : 'bg-opacity-50 cursor-pointer'
               }`}
-              onClick={() => handleDotClick(i)} // <-- Add onClick event handler
+              onClick={() => handleDotClick(i)}
             />
           ))}
         </div>

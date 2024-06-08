@@ -6,7 +6,7 @@ import {
   where,
 } from 'firebase/firestore'
 import { app } from '../firebase'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Products from '../components/Products'
 import { categories } from '../data'
@@ -17,14 +17,13 @@ import { handleChange } from '../helper/productSlice'
 // Initialize Firestore outside of the component
 const db = getFirestore(app)
 
+// Define fetchItems function outside of the component to prevent re-creation on each render
 const fetchItems = async ({ queryKey }) => {
   const [, category, search] = queryKey
-  let q
-  if (category === 'All') {
-    q = query(collection(db, 'data'))
-  } else {
-    q = query(collection(db, 'data'), where('category', '==', category))
-  }
+  let q =
+    category === 'All'
+      ? query(collection(db, 'data'))
+      : query(collection(db, 'data'), where('category', '==', category))
 
   if (search) {
     q = query(
@@ -35,9 +34,7 @@ const fetchItems = async ({ queryKey }) => {
   }
 
   const querySnapshot = await getDocs(q)
-  return querySnapshot.docs.map((doc) => {
-    return { docId: doc.id, ...doc.data() }
-  })
+  return querySnapshot.docs.map((doc) => ({ docId: doc.id, ...doc.data() }))
 }
 
 const Home = () => {
@@ -46,15 +43,27 @@ const Home = () => {
   const [category, setCategory] = useState('All')
   const [categoryIndex, setCategoryIndex] = useState(0)
 
+  // Memoize query keys and fetch function to avoid unnecessary fetches
+  const queryKey = useMemo(
+    () => ['items', category, search],
+    [category, search]
+  )
+
   const {
-    data: items,
+    data: items = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['items', category, search],
+    queryKey,
     queryFn: fetchItems,
     keepPreviousData: true,
   })
+
+  // Memoized callback to handle category selection
+  const handleCategoryClick = useCallback((index, cat) => {
+    setCategoryIndex(index)
+    setCategory(cat.name)
+  }, [])
 
   if (isLoading) {
     return (
@@ -73,7 +82,7 @@ const Home = () => {
   }
 
   return (
-    <div className='max-w-7xl mx-auto px-8 h-screen flex flex-col  relative'>
+    <div className='max-w-7xl mx-auto px-8 h-screen flex flex-col relative'>
       <article className='fixed w-[90vw] top-0 pb-4 bg-white max-w-[1200px] mx-auto px-8 z-10'>
         <Navbar />
       </article>
@@ -81,7 +90,7 @@ const Home = () => {
       <div className='fixed z-10 bg-white w-full mt-[8rem] mb-[10rem] sm:mt-20 px-8 flex flex-wrap'>
         {search ? (
           <button
-            className='mt-8 btn btn-error '
+            className='mt-8 btn btn-error'
             onClick={() =>
               dispatch(handleChange({ name: 'search', value: '' }))
             }
@@ -97,10 +106,7 @@ const Home = () => {
                   ? 'border-b-2 border-black'
                   : 'hover:cursor-pointer'
               }`}
-              onClick={() => {
-                setCategoryIndex(index)
-                setCategory(cat.name)
-              }}
+              onClick={() => handleCategoryClick(index, cat)}
             >
               <div className='mr-2'>{cat.icon}</div>
               <div>{cat.name}</div>
@@ -114,7 +120,7 @@ const Home = () => {
           <Products data={items} />
         ) : (
           <div className='mt-8 px-8'>
-            <h1>Sorry,no item matches...</h1>
+            <h1>Sorry, no item matches...</h1>
           </div>
         )}
       </div>

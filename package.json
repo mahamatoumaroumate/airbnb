@@ -27,6 +27,7 @@
     "react-router-dom": "^6.23.1",
     "react-slick": "^0.30.2",
     "react-toastify": "^10.0.5",
+    "react-window": "^1.8.10",
     "slick-carousel": "^1.8.1"
   },
   "devDependencies": {
